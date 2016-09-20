@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title>移动端滑动日历组件</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            border: 0;
+            outline: 0;
+            font-weight: inherit;
+            font-style: inherit;
+            line-height: inherit;
+            border:none;
+            list-style: none;
+        }
+        #slideCalendar{
+            overflow:hidden;
+            border:1px solid #ccc;
+            position: fixed;
+            bottom:0;
+            width: 100%;
+        }
+        .date-d{
+            height:120px;
+            overflow:hidden;
+        }
+        .date-tile li,.date-year,.date-month,.date-day{
+            display: inline-block;
+            width: 33.33333%;
+            text-align: center;
+            vertical-align:top;
+        }
+        .date-year,.date-month,.date-day{
+            position: relative;
+        }
+        .date-year > li,.date-month > li,.date-day > li{
+            height:40px;
+            line-height: 40px;
+            font-size:14px;
+            box-sizing: border-box;
+            color:rgb(153,153,153)
+        }
+        #slideCalendar .select{
+            font-size:16px;
+            color:#0a0a0a;
+        }
+        .control span{
+            display: inline-block;
+            width: 50%;
+            box-sizing: border-box;
+            padding: 0 30px ;
+            margin: 10px 0;
+        }
+        .control span:nth-last-child(1){
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div  id="slideCalendar">
+    <!--<div class="control">
+       <span>取消</span>
+       <span id="confirm">确定</span>
+    </div>
+    <ul class="date-tile">
+        <li>年</li>
+        <li>月</li>
+        <li>日</li>
+    </ul>
+    <div class="date-d">
+    <ul class="date-year" id="date-year"></ul>
+    <ul class="date-month" id="date-month"></ul>
+    <ul class="date-day" id="date-day"></ul>
+    </div>-->
+</div>
+<input type="text" id="new-date" placeholder="点击选择日期"  readonly="value"/>
+<p>PS:请在手机浏览器中或模拟手机浏览器中打开此页面进行浏览</p>
+<script>
+    function slideCalendar(){
+        //输出到DOM节点
+        this.id = document.getElementById("slideCalendar");
+        //初始化年份
+        this.year = [2000,2020];
+        //初始化日期,默认当前最新时间，输入格式是new Date(2014,6,5) ，月份是从0开始算的，0=1月……
+        this.initDate = new Date();
+        //绑定到某个input的id上，点击显示，将返回的值传给该input
+        this.binding = document.getElementById("new-date");
+    }
+</script>
+<script src="js/slideCalendar.js"></script>
+</body>
+</html>
