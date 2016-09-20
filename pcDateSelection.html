@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PC日历组件</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .week,.day,.date-selection{
+            width: 280px;
+            overflow: hidden;
+            list-style: none;
+        }
+        .week li,.day li{
+            float:left;
+           width: 40px;
+            height:40px;
+            text-align: center;
+            line-height: 40px;
+        }
+        .li-hover:hover{
+            cursor:pointer;
+            color:#fff;
+            background-color: #34538b;
+        }
+        .date-selection{
+            border:1px solid #ccc;
+            text-align: center;
+            overflow: hidden;
+            list-style: none;
+        }
+        .parent{
+            position: relative;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+<!--样式就懒得写了~根据自己的需要进行调整即可o(∩_∩)o -->
+<div class="parent">
+<input type="text" id="date-input" readonly placeholder="点击选择日期" />
+<div class="date-selection" id="date-selection"></div>
+</div>
+
+<div class="parent">
+<div id="date-div">点击选择日期</div>
+<div class="date-selection" id="date-selection1"></div>
+</div>
+<script src="js/pcDateSelection.js"></script>
+<script>
+    var date = new DateSelection({
+        //存放日期
+        dateId:document.getElementById("date-selection"),
+        //传递返回的值
+        bind:document.getElementById("date-input")
+    });
+    date.date1Init();
+
+    var date1 = new DateSelection({
+        //存放日期
+        dateId:document.getElementById("date-selection1"),
+        //传递返回的值,input或者div皆可
+        bind:document.getElementById("date-div")
+    });
+    date1.date1Init();
+</script>
+
+</body>
+</html>

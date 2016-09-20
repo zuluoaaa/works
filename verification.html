@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>登录表单</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/login.css" />
+</head>
+<body class="body">
+    <form action="" class="login">
+        <label for=""><span>账号</span><input type="text" id="account" /></label>
+        <label for=""><span>密码</span><input type="password" id="password" /><a href="#">忘记密码？</a></label>
+        <label for=""><input type="text" placeholder="验证码" id="code1" maxlength="4" /><div id="code"><canvas id="code2" width="58px" height="64px" ></canvas></div></label>
+        <div class="prompt" id="prompt"></div>
+        <input type="button" id="login" value="立即登入" />
+    </form>
+<script src="js/generate.js"></script>
+</body>
+</html>

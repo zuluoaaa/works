@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>无缝滚动</title>
+    <style>
+        div{
+            overflow: hidden;
+            height: 250px;
+            border:1px solid #ccc;
+            margin-top:50px;
+        }
+        ul{
+            display: block;
+
+            position: relative;
+        }
+        li{
+            line-height: 40px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <ul id="quer-body">
+        <li>00000000000000000000000000000</li>
+        <li>11111111111111111111111111111</li>
+        <li>22222222222222222222222222222</li>
+        <li>33333333333333333333333333333</li>
+        <li>44444444444444444444444444444</li>
+        <li>55555555555555555555555555555</li>
+        <li>66666666666666666666666666666</li>
+        <li>77777777777777777777777777777</li>
+        <li>88888888888888888888888888888</li>
+        <li>99999999999999999999999999999</li>
+        <li>10101010100101010101010010000</li>
+    </ul>
+</div>
+<p>//触屏停止滚动</p>
+<script>
+
+    function TopSilide(obj){
+        this.dom = obj;
+        //存放定时器
+        this.time = null;
+    }
+    TopSilide.prototype = {
+        init:function(){
+            this.slide();
+        },
+        slide:function(){
+            var self = this;
+            this.dom.id.style.top=0;
+            clearInterval(self.time);
+            //var top = parseInt(self.dom.id.style.top);
+            var upper = this.dom.id.offsetHeight;
+            self.setDom();
+
+            this.time = setInterval(self.timeSlide(parseInt(self.dom.id.style.top),upper),30);
+            this.dom.id.onmouseover = function(){
+                clearInterval(self.time);
+            };
+            this.dom.id.onmouseout = function(){
+                self.time = setInterval(self.timeSlide(parseInt(self.dom.id.style.top),upper),30);
+            }
+        },
+        timeSlide:function(top,upper){
+            var self = this;
+            return(function(){
+                        if(Math.abs(top) >= upper){
+                            self.dom.id.style.top = 0;
+                            top = 0;
+                        }
+                        top--;
+                        self.dom.id.style.top =  top+"px";
+
+                    }
+            )
+        },
+        setDom:function(){
+            var li = this.dom.id.getElementsByTagName("li");
+
+            for(var i= 0,len=li.length;i<len;i++){
+                if(i>=10){
+                    return false;
+                }
+                var newLi = document.createElement("li");
+                newLi.innerHTML = li[i].innerHTML;
+                this.dom.id.appendChild(newLi);
+            }
+        }
+    };
+    var silideSl = new TopSilide({
+        id:document.getElementById("quer-body")
+    });
+    silideSl.init();
+</script>
+</body>
+</html>

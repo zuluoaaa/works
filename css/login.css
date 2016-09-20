@@ -1,0 +1,107 @@
+
+a{
+    color:inherit;
+}
+.login{
+    width: 600px;
+    height: 345px;
+    display: block;
+    margin:0 auto;
+    position: relative;
+    top:50%;
+    margin-top:-200px;
+    border-radius: 20px;
+    padding:34px 49px;
+    box-sizing: border-box;
+    background-color: #fff;
+    overflow: hidden;
+}
+.head{
+    overflow: auto;
+    text-align: center;
+    color:#ffb400;
+    font-size: 24px;
+}
+
+.login >label{
+    position:relative;
+    line-height: 65px;
+    font-size: 18px;
+}
+.login >label a{
+    position: absolute;
+    right:0;
+    color:#ccc;
+    z-index: 10;
+    top: 0;
+}
+
+.login >label span{
+    position: absolute;
+    left:10px;
+    z-index: 10;
+}
+.login >label input{
+    width: 100%;
+    border:1px solid #ededed;
+    padding-left: 120px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.login >label:nth-last-child(4) input{
+    padding-right: 80px;
+}
+.login >label:nth-last-child(3) input{
+     padding-left:15px;
+
+ }
+.login >label,.login >input{
+    display: block;
+    width: 100%;
+}
+#login{
+    position: absolute;
+    bottom:0;
+    left:0;
+    background-color: #237fd2;
+    color:#fff;
+    line-height: 60px;
+    font-size: 20px;
+    font-family: inherit;
+    cursor:pointer;
+}
+#code{
+    color:#6b8923;
+    position: absolute;
+    right:0;
+    top:0;
+    padding: 0 10px;
+    cursor: pointer;
+    -moz-user-select:none;/*火狐*/
+    -webkit-user-select:none;/*webkit浏览器*/
+    -ms-user-select:none;/*IE10*/
+    -khtml-user-select:none;/*早期浏览器*/
+    user-select:none;
+}
+.prompt{
+    color:#d43128;
+    text-indent: 1em;
+}
+#mailbox{
+    background: url(../images/yx.png) no-repeat -3% 45%;
+    background-size: 27px;
+}
+.back{
+    height: 330px;
+}
+.back>label:nth-last-child(4) input,.back>label:nth-last-child(3) input  {
+    font-family: "微软雅黑";
+    font-size: 16px;
+    padding-right: 0;
+    padding-left: 125px;
+}
+.login-z{
+    width: 58px;
+    height: 50px;
+}
