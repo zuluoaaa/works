@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Flappy Bird</title>
+    <link rel="stylesheet" href="css/FlappyBird.css">
+</head>
+<body>
+
+<div class="main" id="flappy-bird">
+    <div id="role"><img src="../works/images/user_03.png" alt=""></div>
+     <!--over-->
+    <div class="over" id="game-over">
+     <p>《Flappy Bird》</p>
+     <input class="btn" id="game-start" type="button" value="开始游戏" />
+    </div>
+    <!--计分-->
+    <div class="scoring" id="scoring">
+        分数：0
+    </div>
+    <div class="main-slide" id="left-move">
+
+        <!--障碍物-->
+        <div class="obstacle" id="obstacle"></div>
+
+        <!--背景-->
+        <div class="game-bg" id="game-bg">
+            <img src="../works/images/539dd7efe5d33_01.png" alt="">
+            <img src="../works/images/539dd7efe5d33_02.png" alt="">
+            <img src="../works/images/539dd7efe5d33_01.png" alt="">
+        </div>
+    </div>
+</div>
+
+
+
+<p>点击空格进行操作</p>
+<script src="js/index.js"></script>
+<script>
+
+    (function(){
+        var start =  document.getElementById("game-start");
+
+        //加载地图块
+        example.crZaw(300);
+
+        start.onclick = function(){
+            this.parentNode.style.display = "none";
+            this.value = "再来一把";
+            example.init();
+        };
+        var over =   document.getElementById("game-over");
+        example.gameOver = function(){
+
+            over.getElementsByTagName("p")[0].innerHTML = "游戏结束！得分："+this.scoring.number+"分";
+            over.setAttribute("style","");
+            this.setKeyUp = false;
+            this.clearTime();
+            return false;
+        }
+    }())
+
+
+</script>
+</body>
+</html>
