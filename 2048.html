@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>2048</title>
+    <style>
+        *{
+            padding: 0;
+            margin:0;
+        }
+        ul{
+            display: block;
+            margin:auto;
+            background-color:#888 ;
+            font-size:0;
+            width: 440px;
+            padding:0 0 10px 10px;
+            height:440px;
+            cursor:pointer;
+            border-radius: 5px;;
+        }
+        ul > li {
+            display:inline-block;
+            width:100px;
+            height:100px;
+            overflow: hidden;
+            background-color: #cfcfcf;
+            margin-right:10px;
+            margin-top:10px;
+        }
+        ul > li>span{
+            display: block;
+            height: inherit;
+            font-size:50px;
+            font-weight: 500;
+            font-family: "微软雅黑";
+            text-align: center;
+            line-height:100px;
+            color:#fff;
+        }
+        .empty{
+            background-color: #5c5c5c;
+        }
+        .orange{
+            background-color: #8d7100;
+        }
+        .orange1{
+            background-color: #cfa603;;
+        }
+        .orange2{
+            background-color: #ffcd04;;
+        }
+        .yellow{
+            background-color: #cd5c30;
+        }
+        .yellow1{
+            background-color: #ee5114;
+        }
+        .yellow2{
+            background-color: #ff4700;
+        }
+        .yellow3{
+            background-color: #f6ff00;
+        }
+    </style>
+</head>
+<body>
+<ul id="main">
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty" ><span></span></li>
+    <li  class="empty"><span></span></li>
+    <li  class="empty"><span></span></li>
+    <li  class="empty"><span></span></li>
+</ul>
+<p>//使用键盘W（上），X（下），A（左），D（右）</p>
+<script>
+    var game2048 = (function(){
+
+        var _only;
+
+        function operation(){
+            this.id =  document.getElementById("main");
+            this.result = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+            //读取剩下的位置，返回一个随机位置
+            this.surplus = function(data){
+                var newNumber = [];
+                for(var i= 0,len=data.length;i<len;i++){
+
+                    for(var z= 0,zLen = data[i].length;z<zLen;z++){
+                        if(data[i][z] == "0"){
+                            newNumber.push( String(i) + String(z));
+                        }
+                    }
+                }
+                var max = newNumber.length;
+                var random = Math.floor(Math.random() * max );
+
+
+                if(newNumber.length == 0){
+                    //判断over
+                    this.over(this.result);
+                    return  false;
+                }
+                return newNumber[random] ;
+            };
+
+            //每次随机生成一个2或4
+            this.randomNumber = function(){
+                var number = [2,4];
+                var random = Math.floor(Math.random() * number.length );
+                return number[random];
+            };
+
+            //监听游戏是否结束
+            this.over  = function(data){
+                var fb = data.concat();
+                data = data.join("");
+                //对比当前数值跟两次向上或向下滑动的数据是否相同，如果相同
+                var   leftData = this.zyMove("65").join("");
+                this.result = fb;
+                var   topData  = this.tbMove("87").join("");
+                this.result = fb;
+                if(data == leftData && data == topData ){
+                    alert("Game over!");
+                    this.result = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+                    this.initGame();
+                    this.initGame();
+                    this.initHTML();
+                }
+            };
+        }
+        operation.prototype = {
+            init:function(){
+                this.initGame();
+                this.initGame();
+                this.initHTML();
+            },
+            initHTML:function(){
+                var li = this.id.getElementsByTagName("span"),
+                        count = 0;
+                for(var i= 0,len=this.result.length;i<len;i++){
+                    for(var z= 0,zlen=this.result[i].length;z<zlen;z++){
+                        li[count].innerText = "";
+                        if( this.result[i][z] != "0"){
+                            li[count].innerText = this.result[i][z];
+                            //判断数值大小，给予对应颜色
+                            li[count].className = this.renderColor(li[count].innerText);
+                        }else{
+                            li[count].className = "empty";
+                        }
+                        count++;
+                    }
+                }
+            },
+            zyMove: function(keyCode){
+            for(var i= 0,len=this.result.length;i<len;i++){
+                var interim = [];
+                for(var z= 0,zlen=this.result[i].length;z<zlen;z++){
+                    if(this.result[i][z] != "0"){
+                        interim.push(this.result[i][z])
+                    }
+                }
+                if(keyCode == "65"){
+                    this.result[i] = this.leftCount(interim);
+                }else if(keyCode == "68"){
+                    this.result[i] = this.rightReverse(interim);
+                }
+            }
+            return   this.result.concat();
+        },
+            tbMove : function(keyCode) {
+            var self = this;
+            var sz =  [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+            (function(){
+                for (var i = 0, len = self.result.length; i < len; i++) {
+                    for (var z = 0, zlen = self.result[i].length; z < zlen; z++) {
+
+                        if(self.result[z][i] != "0"){
+                            sz[i][z] = self.result[z][i];
+                        }
+
+                    }
+                }
+            }());
+            var newSz = [];
+
+            for (var k = 0, kLen = sz.length; k < kLen; k++) {
+                var interim = [];
+                for (var x = 0, xLen = sz[k].length; x < xLen; x++) {
+                    if (sz[k][x] != "0") {
+                        interim.push(sz[k][x])
+                    }
+                }
+                if(keyCode == "87") {
+                    newSz[k] = this.leftCount(interim);
+                }else if(keyCode == "83"){
+                    newSz[k] = this.rightReverse(interim);
+                }
+            }
+            var jg = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+            (function(){
+                for (var i = 0, len = newSz.length; i < len; i++) {
+                    for (var z = 0, zlen = newSz[i].length; z < zlen; z++) {
+                        jg[z][i] =newSz[i][z];
+                    }
+                }
+            }());
+            this.result = jg;
+            return this.result.concat();
+        },
+            renderColor:function(date){
+                var className;
+
+                if(date <8){
+                    className = "empty";
+                }
+                else if(date == 8){
+                    className = "orange";
+                }else if(date <= 32){
+                    className = "orange1";
+                }else if(date <= 64){
+                    className = "orange2";
+                }else if(date <= 128){
+                    className = "yellow";
+                }else if(date <= 256){
+                    className = "yellow";
+                }else if(date == 512){
+                    className ="yellow1";
+                }else if(date == 1024){
+                    className = "yellow2";
+                }else if(date == 2048){
+                    className = "yellow3";
+                    alert("victory！");
+                    this.result = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+                    this.init();
+                    return false;
+                }
+                return className;
+            },
+            initGame:function(){
+                var index = this.surplus(this.result),
+                        numbers = this.randomNumber() || 0;
+                if(index === false){
+                    return false;
+                }
+                this.result[index[0]][index[1]] = numbers;
+            },
+            //向右滑动，
+            rightReverse:function(array){
+                var zz = this.leftCount(array);
+                var newData = zz;
+                var jNumber = 0;
+                for(var i= newData.length-1;i>=0;i--){
+                    if( newData[i] == "0"){
+                        newData.splice(i,1);
+                        jNumber++;
+                    }
+                }
+                for(var z= 0;z<jNumber;z++){
+                    newData.splice(0,0,0);
+                }
+                return newData
+            },
+            leftCount:function(array){
+                var data = [0,0,0,0];
+                var len = array.length;
+                if(len == "1"){
+                    data = [array[0],0,0,0];
+                }else if(len == "2"){
+                    if(array[0] == array[1]){
+                        array[0] = array[0] + array[1];
+                        data = [array[0],0,0,0];
+                    }else if(array[0] != array[1]){
+                        data= [array[0],array[1],0,0];
+                    }
+                }else if(len == "3"){
+                    if(array[0] == array[1]){
+                        array[0] = array[0] + array[1];
+                        data = [array[0],array[2],0,0];
+                    }else if(array[0] != array[1]){
+                        if(array[1] != array[2]){
+                            data = [array[0],array[1],array[2],0];
+                        }else{
+                            array[1] = array[1] + array[2];
+                            data = [array[0],array[1],0,0];
+                        }
+                    }
+                }else if(len == "4"){
+                    if(array[0] == array[1] && array[2] == array[3]){
+                        array[0] +=  array[1];
+                        array[2] +=  array[3];
+                        data = [array[0],array[2],0,0];
+                    }else if(array[0] == array[1] &&  array[2] != array[3]){
+                        array[0] +=  array[1];
+                        data = [array[0],array[2],array[3],0];
+                    }else if(array[1] ==  array[2]){
+                        array[1] +=  array[2];
+                        data = [array[0],array[1],array[3],0];
+                    }else if(array[2] ==  array[3]){
+                        array[2] +=  array[3];
+                        data = [array[0],array[1],array[2],0];
+                    }
+                    else{
+                        data = [array[0],array[1],array[2],array[3]];
+                    }
+                }
+                return data;
+            }
+        };
+        //parseInt(Math.random()*(上限-下限+1)+下限);
+
+
+        if(typeof _only != "object"){
+            _only = new operation();
+            return _only;
+        }else{
+            return _only;
+        }
+
+    }());
+
+    (function(){
+       //初始化加载
+       game2048.init();
+
+        document.onkeydown =function(e){
+            e = e || event;
+            if( e.keyCode == "87" || e.keyCode == "83"){
+                //向上
+               game2048.tbMove(e.keyCode);
+               game2048.initGame();
+               game2048.initHTML();
+            }else  if( e.keyCode == "65" || e.keyCode == "68"){
+                //向左
+                game2048.zyMove(e.keyCode);
+                game2048.initGame();
+                game2048.initHTML();
+            }
+        };
+    }());
+
+</script>
+</body>
+</html>

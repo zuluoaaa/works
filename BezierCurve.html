@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>贝塞尔曲线</title>
+</head>
+<body>
+<canvas id="myCanvas" style="border:1px solid red"></canvas>
+<script>
+
+
+ var lineLength  = function (a,b) {
+     if(a[0] === b[0]){
+         return Math.abs(a[1]-b[1])
+     }
+     else if(a[1] === b[1]){
+         return Math.abs(a[0]-b[0])
+     }else{
+         var left = Math.abs(a[0]-b[0]);
+         var bottom = Math.abs(a[1]-b[1]);
+         var sum = left*left + bottom*bottom;
+         return Math.sqrt(sum);
+     }
+ }
+
+
+
+
+
+ const myCanvas = document.getElementById("myCanvas");
+ const canvas = myCanvas.getContext("2d");
+ const coordinateSet = [{x:30,y:44},{x:350,y:50}];
+
+ const Base_Data = {
+     width:800,
+     height:500
+ }
+ myCanvas.setAttribute("width",Base_Data.width);
+ myCanvas.setAttribute("height",Base_Data.height);
+
+
+ function initEvent() {
+     var isLeftClick = false;
+     myCanvas.onmousedown = function (e) {
+         if(e.button === 0){
+             isLeftClick = true;
+             console.log("push :",e.offsetX,e.offsetY);
+             coordinateSet.push({
+                 x:e.offsetX,
+                 y:e.offsetY
+             })
+         }
+     }
+     myCanvas.onmousemove = function (e) {
+         if(isLeftClick){
+
+         }
+     }
+     myCanvas.onmouseup = function (e) {
+         isLeftClick = false;
+
+     }
+     myCanvas.onmouseout = function (e) {
+         isLeftClick = false;
+     }
+ }
+
+ function run() {
+     var newCanvas = canvas.createImageData(Base_Data.width,Base_Data.height);
+
+     var twoMatrix = ImageMatrixUtils.oneToTwo(newCanvas.data,Base_Data.width);
+     twoMatrix = renderLine(twoMatrix,coordinateSet);
+     var oneMatrix = ImageMatrixUtils.twoToOne(twoMatrix);
+     console.log(oneMatrix);
+     for(var i in newCanvas.data){
+         newCanvas.data[i] = oneMatrix[i];
+     }
+     canvas.putImageData(newCanvas,0,0);
+ }
+
+ function renderLine(twoMatrix,coordinateSet) {
+     console.log(twoMatrix);
+     for(var i =0;i<coordinateSet.length-1;i++){
+         var start = coordinateSet[i],
+             end = coordinateSet[i+1];
+
+         if(end.x < start.x){
+             var temp = end;
+             end = start;
+             start = temp;
+         }
+
+         var opp = lineLength([start.x,start.y],[end.x,end.y]);
+         console.log(opp);
+         twoMatrix[start.y][start.x] = {
+             r:0,g:0,b:0,a:255
+         };
+         twoMatrix[end.y][end.x] = {
+             r:0,g:0,b:0,a:255
+         };
+         var sin = (Math.abs(start.y-end.y))/opp;
+         var angle = Math.round(Math.asin(sin)/(2*Math.PI/360));
+
+         var w = Math.abs(start.x-end.x);
+         var h = Math.abs(start.y-end.y);
+        /* console.log(w,h);
+         console.log(start.x,start.y);*/
+        console.log(angle,6666)
+        var error = 0;
+        if(!omparativeAngle(angle,45,5)){
+            error = 3;
+        }
+         for(var x = start.x+1;x<end.x;x++){
+             for(var y = 0;y<=end.y;y++){
+                 if(x > start.x && y > start.y && x < end.x && y < end.y){
+                     var xy = lineLength([start.x,start.y],[x,y]);
+                     var tempSin = (Math.abs(start.y-y))/xy;
+                     var tempAngle = Math.round(Math.asin(tempSin)/(2*Math.PI/360));
+                     //
+                     if(omparativeAngle(angle,tempAngle,error)){
+                         twoMatrix[y][x] = {
+                             r:255,g:0,b:0,a:255
+                         }
+                         error -= 0.05
+                         break;
+                     }
+                 }
+             }
+         }
+     }
+     return twoMatrix;
+ }
+
+ 
+ function omparativeAngle(a,b,error){
+     if(a === b){
+         return true;
+     }
+     if(Math.abs(a-b)<error){
+         return true;
+     }else{
+         return false;
+     }
+ }
+ 
+ var ImageMatrixUtils = {
+     oneToTwo: function (orginalData, w) {
+         let arr = [];
+         let index = 0;
+         let len = Math.ceil(orginalData.length / 4 / w);
+
+         for (let i = 0; i < len; i++) {
+             let temp = [];
+             for (let z = 0; z < w; z++) {
+                 temp.push({
+                     r: orginalData[index],
+                     g: orginalData[index + 1],
+                     b: orginalData[index + 2],
+                     a: orginalData[index + 3]
+                 });
+                 index += 4;
+             }
+             arr.push(temp);
+         }
+         return arr;
+     },
+     twoToOne: function (orginalData) {
+         let arr = [];
+         for (var i in orginalData) {
+             for (var z in orginalData[i]) {
+                 arr.push(orginalData[i][z].r);
+                 arr.push(orginalData[i][z].g);
+                 arr.push(orginalData[i][z].b);
+                 arr.push(orginalData[i][z].a);
+             }
+         }
+         return arr;
+     }
+ }
+ initEvent();
+ run()
+</script>
+</body>
+</html>
