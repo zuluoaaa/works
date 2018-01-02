@@ -7,9 +7,6 @@
 <body>
 <canvas id="myCanvas" style="border:1px solid red"></canvas>
 <script>
- var a = [0,0],
-     b = [30,45],
-     c = [50,50];
 
 
  var lineLength  = function (a,b) {
@@ -32,7 +29,7 @@
 
  const myCanvas = document.getElementById("myCanvas");
  const canvas = myCanvas.getContext("2d");
- const coordinateSet = [{x:40,y:25},{x:180,y:150}];
+ const coordinateSet = [{x:30,y:44},{x:350,y:50}];
 
  const Base_Data = {
      width:800,
@@ -76,9 +73,7 @@
      var oneMatrix = ImageMatrixUtils.twoToOne(twoMatrix);
      console.log(oneMatrix);
      for(var i in newCanvas.data){
-         if(oneMatrix[i]>200){
-             newCanvas.data[i] = oneMatrix[i];
-         }
+         newCanvas.data[i] = oneMatrix[i];
      }
      canvas.putImageData(newCanvas,0,0);
  }
@@ -88,33 +83,47 @@
      for(var i =0;i<coordinateSet.length-1;i++){
          var start = coordinateSet[i],
              end = coordinateSet[i+1];
+
+         if(end.x < start.x){
+             var temp = end;
+             end = start;
+             start = temp;
+         }
+
          var opp = lineLength([start.x,start.y],[end.x,end.y]);
+         console.log(opp);
          twoMatrix[start.y][start.x] = {
              r:0,g:0,b:0,a:255
          };
          twoMatrix[end.y][end.x] = {
              r:0,g:0,b:0,a:255
          };
-         var sin = (Math.abs(start.x-end.x))/opp;
+         var sin = (Math.abs(start.y-end.y))/opp;
          var angle = Math.round(Math.asin(sin)/(2*Math.PI/360));
-         console.log(angle);
+
          var w = Math.abs(start.x-end.x);
          var h = Math.abs(start.y-end.y);
         /* console.log(w,h);
          console.log(start.x,start.y);*/
+        console.log(angle,6666)
+        var error = 0;
+        if(!omparativeAngle(angle,45,5)){
+            error = 3;
+        }
          for(var x = start.x+1;x<end.x;x++){
              for(var y = 0;y<=end.y;y++){
-                 var xy = lineLength([start.x,start.y],[x,y]);
-                 //console.log(xy,[start.x,start.y],[x,y]);
-                 var tempSin = (Math.abs(start.x-x))/xy;
-                 var tempAngle = Math.round(Math.asin(tempSin)/(2*Math.PI/360));
-                 //
-                 if(angle === tempAngle){
-                     console.log([start.x,start.y],[x,y],xy);
-                     twoMatrix[y][x] = {
-                         r:255,g:0,b:0,a:255
+                 if(x > start.x && y > start.y && x < end.x && y < end.y){
+                     var xy = lineLength([start.x,start.y],[x,y]);
+                     var tempSin = (Math.abs(start.y-y))/xy;
+                     var tempAngle = Math.round(Math.asin(tempSin)/(2*Math.PI/360));
+                     //
+                     if(omparativeAngle(angle,tempAngle,error)){
+                         twoMatrix[y][x] = {
+                             r:255,g:0,b:0,a:255
+                         }
+                         error -= 0.05
+                         break;
                      }
-                     break;
                  }
              }
          }
@@ -122,6 +131,18 @@
      return twoMatrix;
  }
 
+ 
+ function omparativeAngle(a,b,error){
+     if(a === b){
+         return true;
+     }
+     if(Math.abs(a-b)<error){
+         return true;
+     }else{
+         return false;
+     }
+ }
+ 
  var ImageMatrixUtils = {
      oneToTwo: function (orginalData, w) {
          let arr = [];
