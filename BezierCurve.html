@@ -20,8 +20,13 @@
         }else{
             var left = Math.abs(a[0]-b[0]);
             var bottom = Math.abs(a[1]-b[1]);
-            var sum = left*left + bottom*bottom;
-            return left/Math.sqrt(sum);
+            //var sum = left*left + bottom*bottom;
+            console.log(left,bottom);
+            if(left>bottom){
+                return bottom/left
+            }else{
+                return left/bottom
+            }
         }
     }
 
@@ -30,7 +35,7 @@
 
  const myCanvas = document.getElementById("myCanvas");
  const canvas = myCanvas.getContext("2d");
- const coordinateSet = [{x:0,y:0},{x:40,y:200}];
+ const coordinateSet = [{x:175,y:313},{x:597,y:140}];
 
  const Base_Data = {
      width:800,
@@ -79,7 +84,7 @@
      canvas.putImageData(newCanvas,0,0);
  }
 
- function renderLine(twoMatrix,coordinateSet) {
+    function renderLine(twoMatrix,coordinateSet) {
 
      for(var i =0;i<coordinateSet.length-1;i++){
          var start = coordinateSet[i],
@@ -91,22 +96,23 @@
          twoMatrix[end.y][end.x] = {
              r:0,g:0,b:0,a:255
          };
+         if(end.x < start.x){
+             var temp = end;
+             end = start;
+             start = temp;
+         }
 
         var dx = start.x - end.x;
         var dy = start.y - end.y;
         var directionX = dx > 0 ? -1 : 1;
         var directionY = dy > 0 ? -1 : 1;
         var k = lineLength([start.x,start.y],[end.x,end.y]);
-         let e = -0.5;
-
-
-         console.log(start,end,dx,dy,k);
-         console.log(twoMatrix);
+         let e = 0;
         if(Math.abs(dx)>=Math.abs(dy)){
 
             let y = start.y;
             for(let x =start.x;x<end.x;x+=directionX){
-                console.log(x,y);
+
                 if(y>0 && x>0){
                     twoMatrix[y][x] = {
                         r:255,g:0,b:0,a:255
@@ -176,7 +182,7 @@
      }
  }
  initEvent();
- run()
+    run()
 </script>
 </body>
 </html>
