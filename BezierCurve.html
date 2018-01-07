@@ -6,27 +6,18 @@
 </head>
 <body>
 <canvas id="myCanvas" style="border:1px solid red"></canvas>
+<a href="javascript:run()">rua</a>
 <script>
 
 
-
-
     var lineLength  = function (a,b) {
-        if(a[0] === b[0]){
-            return Math.abs(a[1]-b[1])
-        }
-        else if(a[1] === b[1]){
-            return Math.abs(a[0]-b[0])
+        let left = Math.abs(a[0]-b[0]);
+        let bottom = Math.abs(a[1]-b[1]);
+
+        if(left>bottom){
+            return bottom/left
         }else{
-            var left = Math.abs(a[0]-b[0]);
-            var bottom = Math.abs(a[1]-b[1]);
-            //var sum = left*left + bottom*bottom;
-            console.log(left,bottom);
-            if(left>bottom){
-                return bottom/left
-            }else{
-                return left/bottom
-            }
+            return left/bottom
         }
     }
 
@@ -35,8 +26,8 @@
 
  const myCanvas = document.getElementById("myCanvas");
  const canvas = myCanvas.getContext("2d");
- const coordinateSet = [{x:175,y:313},{x:597,y:140}];
-
+ const coordinateSet = [];
+ var coordinateSetDetails = [];
  const Base_Data = {
      width:800,
      height:500
@@ -76,74 +67,174 @@
 
      var twoMatrix = ImageMatrixUtils.oneToTwo(newCanvas.data,Base_Data.width);
      twoMatrix = renderLine(twoMatrix,coordinateSet);
-     var oneMatrix = ImageMatrixUtils.twoToOne(twoMatrix);
+    render(twoMatrix,newCanvas);
+    startRenderBezierCurve(twoMatrix,newCanvas);
 
+ }
+
+ function render(twoMatrix,newCanvas) {
+     var oneMatrix = ImageMatrixUtils.twoToOne(twoMatrix);
      for(var i in newCanvas.data){
          newCanvas.data[i] = oneMatrix[i];
      }
      canvas.putImageData(newCanvas,0,0);
  }
 
-    function renderLine(twoMatrix,coordinateSet) {
 
+ function renderLine(twoMatrix,coordinateSet) {
+        coordinateSetDetails = [];
      for(var i =0;i<coordinateSet.length-1;i++){
          var start = coordinateSet[i],
              end = coordinateSet[i+1];
-
-         twoMatrix[start.y][start.x] = {
-             r:0,g:0,b:0,a:255
-         };
-         twoMatrix[end.y][end.x] = {
-             r:0,g:0,b:0,a:255
-         };
-         if(end.x < start.x){
-             var temp = end;
-             end = start;
-             start = temp;
-         }
-
-        var dx = start.x - end.x;
-        var dy = start.y - end.y;
-        var directionX = dx > 0 ? -1 : 1;
-        var directionY = dy > 0 ? -1 : 1;
-        var k = lineLength([start.x,start.y],[end.x,end.y]);
-         let e = 0;
-        if(Math.abs(dx)>=Math.abs(dy)){
-
-            let y = start.y;
-            for(let x =start.x;x<end.x;x+=directionX){
-
-                if(y>0 && x>0){
-                    twoMatrix[y][x] = {
-                        r:255,g:0,b:0,a:255
-                    }
-                }
-                e += k;
-                if(e>0){
-                    y += directionY;
-                    e -= 1;
-                }
-            }
-        }else{
-
-            let x =start.x;
-
-            for(let y = start.y;y<end.y;y+=directionY){
-                console.log(x,y,e);
-                if(y>0 && x>0){
-                    twoMatrix[y][x] = {
-                        r:255,g:0,b:0,a:255
-                    }
-                }
-                e += k;
-                if(e>0){
-                    x += directionX;
-                    e -= 1;
-                }
-            }
-        }
+         whileMatrixAndRenderLine(start,end,{r:255,g:0,b:0,a:255},twoMatrix,[],true);
      }
      return twoMatrix;
+ }
+
+ function whileMatrixAndRenderLine(start,end,color,twoMatrix,coordinate,isPush) {
+
+     if(end.x < start.x){
+         let temp = end;
+         end = start;
+         start = temp;
+     }
+
+     var dx = start.x - end.x;
+     var dy = start.y - end.y;
+     var directionX = dx > 0 ? -1 : 1;
+     var directionY = dy > 0 ? -1 : 1;
+     var k = lineLength([start.x,start.y],[end.x,end.y]);
+     let e = 0;
+
+     if(Math.abs(dx)>=Math.abs(dy)){
+         let y = start.y;
+         for(let x =start.x;x<end.x;x+=directionX){
+
+             if(y>0 && x>0){
+                 coordinate.push({
+                     x:x,
+                     y:y
+                 })
+
+                 twoMatrix[y][x] = color
+             }
+             e += k;
+             if(e>0){
+                 y += directionY;
+                 e -= 1;
+             }
+         }
+     }
+     else{
+         let x =start.x;
+         if(directionY>0){
+             for(let y = start.y;y<end.y;y+=directionY){
+                 if(y>0 && x>0){
+                     coordinate.push({
+                         x:x,
+                         y:y
+                     })
+                     twoMatrix[y][x] = color
+                 }
+                 e += k;
+                 if(e>0){
+                     x += directionX;
+                     e -= 1;
+                 }
+             }
+         }else {
+             for(let y = start.y;y>end.y;y+=directionY){
+                 if(y>0 && x>0){
+                     coordinate.push({
+                         x:x,
+                         y:y
+                     })
+                     twoMatrix[y][x] = color
+                 }
+                 e += k;
+                 if(e>0){
+                     x += directionX;
+                     e -= 1;
+                 }
+             }
+         }
+
+     }
+     if(isPush){
+         console.log("arr",coordinate);
+         coordinateSetDetails.push(coordinate);
+     }
+     return coordinate;
+ }
+
+
+
+ function startRenderBezierCurve(twoMatrix,newCanvas){
+     if(coordinateSetDetails.length<2){
+         return false;
+     }
+     let eachFrame = [];
+     let bezier = [];
+
+     for(let i=0;i<coordinateSetDetails.length-1;i++){
+         let start = coordinateSetDetails[i],
+             end = coordinateSetDetails[i+1];
+
+         if(start.length>=end.length){
+             for(let index=0;index<start.length;index++){
+                 console.log(eachFrame.length)
+                 let tempTwoMatrix = JSON.parse(JSON.stringify(twoMatrix));
+                 let a = start[index],
+                     bl = index/(start.length-1);
+                     b = end[Math.round(bl*(end.length-1))];
+                     let line = whileMatrixAndRenderLine(a,b,{r:0,g:255,b:0,a:255},tempTwoMatrix,[]),
+                     c = line[Math.round(bl*(line.length-1))];
+
+                 bezier.push({y:c.y,x:c.x});
+                 eachFrame.push(tempTwoMatrix);
+                 if(eachFrame.length>30){
+                     break;
+                 }
+             }
+         }else{
+             for(let index=0;index<end.length;index++){
+                 console.log(eachFrame.length)
+                 let tempTwoMatrix = JSON.parse(JSON.stringify(twoMatrix));
+                 let a = end[index],
+                     bl = index/(end.length-1),
+                     b = start[Math.round(bl*(start.length-1))];
+                     let line = whileMatrixAndRenderLine(a,b,{r:0,g:255,b:0,a:255},tempTwoMatrix,[]),
+                     c = line[Math.round(bl*(line.length-1))];
+                 bezier.push({y:c.y,x:c.x});
+                 eachFrame.push(tempTwoMatrix);
+                 if(eachFrame.length>30){
+                     break;
+                 }
+             }
+         }
+     }
+
+     console.log(eachFrame,bezier);
+
+     let interval = setInterval(function () {
+         if(eachFrame.length===0){
+             for(let i in bezier){
+                 let x = bezier[i].x,
+                     y = bezier[i].y;
+                 twoMatrix[y][x] = {r:0,g:0,b:255,a:255}
+             }
+             render(twoMatrix,newCanvas);
+             clearInterval(interval);
+             return false;
+         }
+         let one = eachFrame.shift();
+         for(let i in bezier){
+             let x = bezier[i].x,
+                 y = bezier[i].y;
+             one[y][x] = {r:0,g:0,b:255,a:255}
+         }
+         render(one,newCanvas);
+     },150)
  }
 
 
@@ -182,7 +273,7 @@
      }
  }
  initEvent();
-    run()
+
 </script>
 </body>
 </html>
