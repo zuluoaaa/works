@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>贝塞尔曲线</title>
+    <title>bezier curve</title>
 </head>
 <body>
 <canvas id="myCanvas" style="border:1px solid red"></canvas>
@@ -115,8 +115,9 @@
                      x:x,
                      y:y
                  })
-
-                 twoMatrix[y][x] = color
+                 if(twoMatrix){
+                     twoMatrix[y][x] = color
+                 }
              }
              e += k;
              if(e>0){
@@ -134,7 +135,9 @@
                          x:x,
                          y:y
                      })
-                     twoMatrix[y][x] = color
+                     if(twoMatrix){
+                         twoMatrix[y][x] = color
+                     }
                  }
                  e += k;
                  if(e>0){
@@ -149,7 +152,9 @@
                          x:x,
                          y:y
                      })
-                     twoMatrix[y][x] = color
+                     if(twoMatrix){
+                         twoMatrix[y][x] = color
+                     }
                  }
                  e += k;
                  if(e>0){
@@ -161,7 +166,6 @@
 
      }
      if(isPush){
-         console.log("arr",coordinate);
          coordinateSetDetails.push(coordinate);
      }
      return coordinate;
@@ -169,7 +173,8 @@
 
 
 
- function startRenderBezierCurve(twoMatrix,newCanvas){
+
+    function startRenderBezierCurve(twoMatrix,newCanvas){
      if(coordinateSetDetails.length<2){
          return false;
      }
@@ -183,40 +188,45 @@
          if(start.length>=end.length){
              for(let index=0;index<start.length;index++){
                  console.log(eachFrame.length)
-                 let tempTwoMatrix = JSON.parse(JSON.stringify(twoMatrix));
+
                  let a = start[index],
                      bl = index/(start.length-1);
                      b = end[Math.round(bl*(end.length-1))];
-                     let line = whileMatrixAndRenderLine(a,b,{r:0,g:255,b:0,a:255},tempTwoMatrix,[]),
-                     c = line[Math.round(bl*(line.length-1))];
-
+                     let line = whileMatrixAndRenderLine(a,b,{r:0,g:255,b:0,a:255},null,[]),
+                          c = line[Math.ceil(bl*(line.length-1))],
+                          d = line[Math.floor(bl*(line.length-1))];
+                 bezier.push({y:d.y,x:d.x});
                  bezier.push({y:c.y,x:c.x});
-                 eachFrame.push(tempTwoMatrix);
-                 if(eachFrame.length>30){
-                     break;
-                 }
+                 eachFrame.push(line);
+
              }
          }else{
              for(let index=0;index<end.length;index++){
-                 console.log(eachFrame.length)
-                 let tempTwoMatrix = JSON.parse(JSON.stringify(twoMatrix));
+
                  let a = end[index],
                      bl = index/(end.length-1),
                      b = start[Math.round(bl*(start.length-1))];
-                     let line = whileMatrixAndRenderLine(a,b,{r:0,g:255,b:0,a:255},tempTwoMatrix,[]),
-                     c = line[Math.round(bl*(line.length-1))];
+                     let line = whileMatrixAndRenderLine(a,b,{r:0,g:255,b:0,a:255},null,[]),
+                         c = line[Math.ceil(bl*(line.length-1))],
+                         d = line[Math.floor(bl*(line.length-1))];
+                 bezier.push({y:d.y,x:d.x});
                  bezier.push({y:c.y,x:c.x});
-                 eachFrame.push(tempTwoMatrix);
-                 if(eachFrame.length>30){
-                     break;
-                 }
+                 eachFrame.push(line);
+
              }
          }
      }
-
+        for(let i in bezier){
+            let x = bezier[i].x,
+                y = bezier[i].y;
+            twoMatrix[y][x] = {r:0,g:0,b:255,a:255}
+        }
+        render(twoMatrix,newCanvas);
+        return false;
      console.log(eachFrame,bezier);
-
+        let index = 0;
      let interval = setInterval(function () {
+
          if(eachFrame.length===0){
              for(let i in bezier){
                  let x = bezier[i].x,
@@ -227,14 +237,22 @@
              clearInterval(interval);
              return false;
          }
-         let one = eachFrame.shift();
-         for(let i in bezier){
+         let tempTwoMatrix = twoMatrix;
+         let one = eachFrame[index];
+         for(let i in one){
+             tempTwoMatrix[one[i].y][one[i].x] = {r:0,g:255,b:0,a:255}
+         }
+         for(let i=0;i<index;i++){
              let x = bezier[i].x,
                  y = bezier[i].y;
-             one[y][x] = {r:0,g:0,b:255,a:255}
+             tempTwoMatrix[y][x] = {r:0,g:0,b:255,a:255}
          }
-         render(one,newCanvas);
-     },150)
+         for(let i in one){
+             tempTwoMatrix[one[i].y][one[i].x] = {r:0,g:255,b:0,a:255}
+         }
+         render(tempTwoMatrix,newCanvas);
+         ++index;
+     },0)
  }
 
 
